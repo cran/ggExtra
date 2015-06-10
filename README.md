@@ -4,26 +4,26 @@ copy the contents of vignettes/overview.md here, replace all image paths
 (overview_files to vignettes/overview_files),
 and add the TravisCI status -->
 
-ggExtra
+ggExtra - Add marginal histograms to ggplot2, and more ggplot2 enhancements
 =======
 
 [![Build Status](https://travis-ci.org/daattali/ggExtra.svg?branch=master)](https://travis-ci.org/daattali/ggExtra)
+[![Number of downloads](http://cranlogs.r-pkg.org/badges/ggExtra?color=brightgreen)](http://cran.r-project.org/web/packages/ggExtra/index.html)
+[![CRAN version](http://www.r-pkg.org/badges/version/ggExtra)](http://cran.r-project.org/web/packages/ggExtra/index.html)
 
 `ggExtra` is a collection of functions and layers to enhance ggplot2.
+The main function is `ggMarginal`, which can be used to add marginal
+histograms/boxplots/density plots to ggplot2 scatterplots. You can view
+a [live interactive
+demo](http://daattali.com/shiny/ggExtra-ggMarginal-demo/) to see part of
+its capabilities.
 
-Most functions/layers are quite simple but are useful because they are
-fairly common ggplot2 operations that are a bit verbose. After repeating
-the same small bits of ggplot2 code dozens of times, I realized it was
-time to package them :)
+Most other functions/layers are quite simple but are useful because they
+are fairly common ggplot2 operations that are a bit verbose.
 
-The `ggMarginal` function is more complex. After intensive Googling for
-ways to add marginal density plots to ggplot2, I did find a few lengthy
-StackOverflow posts, but every answer had messy code that was specific
-for the dataset in question. I wasn't able to find a simple drop-in
-function for adding marginal densities, so I created one.
-
-Other functions include: `removeGrid` (and two variants), `rotateTextX`,
-`plotCount`.
+This is an instructional document, but I also wrote [a blog
+post](http://deanattali.com/2015/03/29/ggExtra-r-package/) about the
+reasoning behind and development of this package.
 
 *Note: you might notice that there are no unit tests in this package. I
 don't know of a good way to perform tests on plots, if you have a nice
@@ -32,10 +32,15 @@ simple solution please do let me know.*
 Installation
 ------------
 
-`ggExtra` is currently only available through GitHub and can be
-downloaded easily using `devtools`.
+`ggExtra` is available through both CRAN and GitHub.
 
-    # install.packages("devtools")
+To install the CRAN version:
+
+    install.packages("ggExtra")
+
+To install the latest developmental version from GitHub:
+
+    install.packages("devtools")
     devtools::install_github("daattali/ggExtra")
 
 Usage
@@ -49,17 +54,17 @@ functions work.
       library("ggplot2")
     })
 
-`ggMarginal` - Add marginal density/histogram to ggplot2 scatterplots
----------------------------------------------------------------------
+`ggMarginal` - Add marginal histograms/boxplots/density plots to ggplot2 scatterplots
+-------------------------------------------------------------------------------------
 
 You need to have the `grid` and `gridExtra` packages installed for this
 function.
 
 This function is meant to work as an easy drop-in solution for adding
-marginal density plots of histograms to a ggplot2 scatterplot. You can
-either pass it a ready ggplot2 scatterplot and it will add the marginal
-plots, or you can just tell it what dataset and variables to use and it
-will generate the scatterplot plus the marginal plots.
+marginal density plots/histograms/boxplots to a ggplot2 scatterplot. You
+can either pass it a ready ggplot2 scatterplot and it will add the
+marginal plots, or you can just tell it what dataset and variables to
+use and it will generate the scatterplot plus the marginal plots.
 
 As a simple first example, let's create a dataset with 500 points where
 the x values are normally distributed and the y values are uniformly
@@ -69,13 +74,13 @@ distributed, and plot a simple ggplot2 scatterplot.
     df1 <- data.frame(x = rnorm(500, 50, 10), y = runif(500, 0, 50))
     (p1 <- ggplot(df1, aes(x, y)) + geom_point() + theme_bw())
 
-<img src="vignettes\overview_files/figure-markdown_strict/init-plot-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="vignettes/overview_files/figure-markdown_strict/init-plot-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 Ok, now let's add marginal density plots.
 
     ggMarginal(p1)
 
-<img src="vignettes\overview_files/figure-markdown_strict/ggmarginal-basic-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="vignettes/overview_files/figure-markdown_strict/ggmarginal-basic-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 That was easy. Notice how the syntax is not following the standard
 ggplot2 syntax - you don't "add" a ggMarginal layer with
@@ -87,7 +92,7 @@ Let's make the text a bit larger to make it easier to see.
 
     ggMarginal(p1 + theme_bw(30) + ylab("Two\nlines"))
 
-<img src="vignettes\overview_files/figure-markdown_strict/ggmarginal-large-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="vignettes/overview_files/figure-markdown_strict/ggmarginal-large-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 Notice how the marginal plots occupy the correct space, and even when
 the main plot's points are pushed to the right because of larger text or
@@ -97,15 +102,29 @@ You can also show histograms instead.
 
     ggMarginal(p1, type = "histogram")
 
-<img src="vignettes\overview_files/figure-markdown_strict/ggmarginal-hist-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="vignettes/overview_files/figure-markdown_strict/ggmarginal-hist-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 There are several more parameters, here is an example with a few more
-being used.
+being used. Note that you can use any parameters that the `geom_XXX`
+layers accept, and they will be passed to those layers, such as `col`
+and `fill` in the following example.
 
     ggMarginal(p1, margins = "x", size = 2, type = "histogram",
-               marginCol = "blue", marginFill = "orange")
+               col = "blue", fill = "orange")
 
-<img src="vignettes\overview_files/figure-markdown_strict/ggmarginal-params-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="vignettes/overview_files/figure-markdown_strict/ggmarginal-params-1.png" title="" alt="" style="display: block; margin: auto;" />
+
+In the above example, `size = 2` means that the main scatterplot should
+occupy twice as much height/width as the margin plots (default is 5).
+The `col` and `fill` parameters are simply passed to the ggplot layer
+for both margin plots.
+
+If you want to specify some parameter for only one of the marginal
+plots, you can use the `xparams` or `yparams` parameters, like this:
+
+    ggMarginal(p1, type = "histogram", xparams = list(binwidth = 1, fill = "orange"))
+
+<img src="vignettes/overview_files/figure-markdown_strict/ggmarginal-extraparams-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 You don't have to supply a ggplot2 scatterplot, you can also just tell
 ggMarginal what dataset and variables to use, but of course this way you
@@ -114,20 +133,17 @@ text/font/theme/etc).
 
     ggMarginal(data = mtcars, x = "wt", y = "mpg")
 
-<img src="vignettes\overview_files/figure-markdown_strict/ggmarginal-manual-1.png" title="" alt="" style="display: block; margin: auto;" />
-
-`size = 2` means that the main scatterplot should occupy twice as much
-height/width as the margin plots (default is 5).
+<img src="vignettes/overview_files/figure-markdown_strict/ggmarginal-manual-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 Last but not least - you can also save the output from `ggMarginal` and
-display it later. (I know that sounds trivial, but this was not an easy
+display it later. (This may sound trivial, but it was not an easy
 problem to solve - [see this
 discussion](http://stackoverflow.com/questions/29062766/store-output-from-gridextragrid-arrange-into-an-object)).
 
     p <- ggMarginal(p1)
     p
 
-<img src="vignettes\overview_files/figure-markdown_strict/ggmarginal-save-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="vignettes/overview_files/figure-markdown_strict/ggmarginal-save-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 For more information, see `?ggExtra::ggMarginal`.
 
@@ -146,7 +162,7 @@ grid lines can be removed as well (default is to remove both).
     p2 <- ggplot2::ggplot(df2, ggplot2::aes(x, y)) + ggplot2::geom_point()
     p2 + removeGrid()
 
-<img src="vignettes\overview_files/figure-markdown_strict/removeGrid-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="vignettes/overview_files/figure-markdown_strict/removeGrid-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 For more information, see `?ggExtra::removeGrid`.
 
@@ -163,7 +179,7 @@ tick line.
     p3 <- ggplot2::ggplot(df3, ggplot2::aes(x, y)) + ggplot2::geom_point()
     p3 + rotateTextX()
 
-<img src="vignettes\overview_files/figure-markdown_strict/rotateTextX-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="vignettes/overview_files/figure-markdown_strict/rotateTextX-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 For more information, see `?ggExtra::rotateTextX`.
 
@@ -179,7 +195,7 @@ An example using a table:
 
     plotCount(table(infert$education))
 
-<img src="vignettes\overview_files/figure-markdown_strict/plotCount-table-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="vignettes/overview_files/figure-markdown_strict/plotCount-table-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 An example using a data.frame:
 
@@ -187,6 +203,6 @@ An example using a data.frame:
                       "NumWheels" = c(2, 4, 1, 16))
     plotCount(df4) + removeGridX()
 
-<img src="vignettes\overview_files/figure-markdown_strict/plotCount-df-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="vignettes/overview_files/figure-markdown_strict/plotCount-df-1.png" title="" alt="" style="display: block; margin: auto;" />
 
 For more information, see `?ggExtra::plotCount`.

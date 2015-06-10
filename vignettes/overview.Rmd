@@ -19,21 +19,14 @@ knitr::opts_chunk$set(tidy = FALSE, comment = "#>", fig.width = 6,
 
 # ggExtra
 
-`ggExtra` is a collection of functions and layers to enhance ggplot2.
+`ggExtra` is a collection of functions and layers to enhance ggplot2. The main function is `ggMarginal`, which can be used to add marginal histograms/boxplots/density plots to ggplot2 scatterplots. You can view a 
+[live interactive demo](http://daattali.com/shiny/ggExtra-ggMarginal-demo/)
+to see part of its capabilities.
 
-Most functions/layers are quite simple but are useful because they are fairly 
-common ggplot2 operations that are a bit verbose. After repeating the same
-small bits of ggplot2 code dozens of times, I realized it was time to package
-them :)
+Most other functions/layers are quite simple but are useful because they are fairly common ggplot2 operations that are a bit verbose.
 
-The `ggMarginal` function is more complex. After intensive Googling for ways
-to add marginal density plots to ggplot2, I did find a few lengthy StackOverflow
-posts, but every answer had messy code that was specific for the dataset in
-question. I wasn't able to find a simple drop-in function for adding marginal
-densities, so I created one.
-
-Other functions include: `removeGrid` (and two variants), `rotateTextX`,
-`plotCount`.
+This is an instructional document, but I also wrote [a blog post](http://deanattali.com/2015/03/29/ggExtra-r-package/) about the reasoning
+behind and development of this package.
 
 *Note: you might notice that there are no unit tests in this package. I don't
 know of a good way to perform tests on plots, if you have a nice simple
@@ -41,11 +34,18 @@ solution please do let me know.*
 
 ## Installation
 
-`ggExtra` is currently only available through GitHub and can be downloaded
-easily using `devtools`.
+`ggExtra` is available through both CRAN and GitHub.
+
+To install the CRAN version:
 
 ```
-# install.packages("devtools")
+install.packages("ggExtra")
+```
+
+To install the latest developmental version from GitHub:
+
+```
+install.packages("devtools")
 devtools::install_github("daattali/ggExtra")
 ```
 
@@ -60,13 +60,13 @@ suppressPackageStartupMessages({
 })
 ```
 
-## `ggMarginal` - Add marginal density/histogram to ggplot2 scatterplots
+## `ggMarginal` - Add marginal histograms/boxplots/density plots to ggplot2 scatterplots
 
 You need to have the `grid` and `gridExtra` packages installed for this
 function.  
 
 This function is meant to work as an easy drop-in solution for adding marginal
-density plots of histograms to a ggplot2 scatterplot. You can either pass it
+density plots/histograms/boxplots to a ggplot2 scatterplot. You can either pass it
 a ready ggplot2 scatterplot and it will add the marginal plots, or you can just
 tell it what dataset and variables to use and it will generate the scatterplot
 plus the marginal plots.
@@ -109,11 +109,19 @@ You can also show histograms instead.
 ggMarginal(p1, type = "histogram")
 ```
 
-There are several more parameters, here is an example with a few more being used.
+There are several more parameters, here is an example with a few more being used. Note that you can use any parameters that the `geom_XXX` layers accept, and they will be passed to those layers, such as `col` and `fill` in the following example.
 
 ```{r ggmarginal-params}
 ggMarginal(p1, margins = "x", size = 2, type = "histogram",
-           marginCol = "blue", marginFill = "orange")
+           col = "blue", fill = "orange")
+```
+
+In the above example, `size = 2` means that the main scatterplot should occupy twice as much height/width as the margin plots (default is 5). The `col` and `fill` parameters are simply passed to the ggplot layer for both margin plots.
+
+If you want to specify some parameter for only one of the marginal plots, you can use the `xparams` or `yparams` parameters, like this:
+
+```{r ggmarginal-extraparams}
+ggMarginal(p1, type = "histogram", xparams = list(binwidth = 1, fill = "orange"))
 ```
 
 You don't have to supply a ggplot2 scatterplot, you can also just tell ggMarginal
@@ -124,11 +132,8 @@ to customize the main plot (change text/font/theme/etc).
 ggMarginal(data = mtcars, x = "wt", y = "mpg")
 ```
 
-`size = 2` means that the main scatterplot should occupy twice as much height/width
-as the margin plots (default is 5).
-
 Last but not least - you can also save the output from `ggMarginal` and display
-it later. (I know that sounds trivial, but this was not an easy problem to solve
+it later. (This may sound trivial, but it was not an easy problem to solve
 - [see this discussion](http://stackoverflow.com/questions/29062766/store-output-from-gridextragrid-arrange-into-an-object)).
 
 ```{r ggmarginal-save}
