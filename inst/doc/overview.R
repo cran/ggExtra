@@ -27,7 +27,10 @@ ggMarginal(p1, type = "histogram")
 
 ## ----ggmarginal-params---------------------------------------------------
 ggMarginal(p1, margins = "x", size = 2, type = "histogram",
-           marginCol = "blue", marginFill = "orange")
+           col = "blue", fill = "orange")
+
+## ----ggmarginal-extraparams----------------------------------------------
+ggMarginal(p1, type = "histogram", xparams = list(binwidth = 1, fill = "orange"))
 
 ## ----ggmarginal-manual---------------------------------------------------
 ggMarginal(data = mtcars, x = "wt", y = "mpg")

@@ -81,6 +81,18 @@ shinyServer(function(input, output, session) {
       geom_point() +
       theme_bw(fontSize())
     
+    # apply axis transformations to ensure marginal plots still work
+    if (input$xtrans == "log") {
+      p <- p + scale_x_log10()
+    } else if (input$xtrans == "reverse") {
+      p <- p + scale_x_reverse()
+    }
+    if (input$ytrans == "log") {
+      p <- p + scale_y_log10()
+    } else if (input$ytrans == "reverse") {
+      p <- p + scale_y_reverse()
+    }
+    
     if (input$show_marginal) {
       p <- ggExtra::ggMarginal(
         p,
@@ -98,9 +110,23 @@ shinyServer(function(input, output, session) {
   code <- reactive({
     code <- sprintf(paste0(
       "p <- ggplot(`%s`, aes_string('%s', '%s')) +\n",
-      "  geom_point() + theme_bw(%s)\n\n"),
+      "  geom_point() + theme_bw(%s)"),
       input$dataset, input$x_var, input$y_var, fontSize()
     )
+    
+    if (input$xtrans == "log") {
+      code <- paste0(code, " + scale_x_log10()")
+    } else if (input$xtrans == "reverse") {
+      code <- paste0(code, " + scale_x_reverse()")
+    }
+    if (input$ytrans == "log") {
+      code <- paste0(code, " + scale_y_log10()")
+    } else if (input$ytrans == "reverse") {
+      code <- paste0(code, " + scale_y_reverse()")
+    }
+    
+    code <- paste0(code, "\n\n")
+    
     if (input$show_marginal) {
       code <- paste0(code, sprintf(paste0(
         "ggExtra::ggMarginal(\n",
