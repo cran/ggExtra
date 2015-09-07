@@ -1,3 +1,32 @@
+# ggExtra 0.3.0
+
+2015-09-02
+
+- significant internal refactoring of `ggMarginal` to make it work with new ggplot2 version (after version 1.0.1 ggplot2 had tons of breaking changes) (some parts of the function use different code depending on the version of ggplot2 installed, I hope this doesn't raise any bugs)
+- make `ggMarginal` a little more robust to many different theme options so that even if the main plot changes the tick mark lengths or x axis size or many different options, the marginal plots will still align properly
+- add more usage examples to `ggMarginal`
+
+# ggExtra 0.2.3
+
+2015-08-19
+
+- bug fix: ggMarginal now works when the original plot has expressions as the x/y variables. For example, calling ggMarginal on a plot that had `aes(x+10, log(y))` did not work before
+
+# ggExtra 0.2.2
+
+2015-08-17
+
+- simplify and remove some unneeded package checks since `grid` and `gridExtra` should be installed automatically
+
+# ggExtra 0.2.1
+
+2015-08-04
+
+minor changes
+- small updates to ggMarginal demo shiny app
+- small changes to ggMarginal documentation
+- small changes to package DESCRIPTION 
+
 # ggExtra 0.2.0
 
 2015-07-10

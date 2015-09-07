@@ -20,17 +20,16 @@
 #' compared to the main plot. A size of 5 means that the main plot is 5x wider
 #' and 5x taller than the marginal plots.
 #' @param ... Extra parameters to pass to the marginal plots. Any parameter that
-#' \code{geom_line()}, \code{geom_bar()}, or \code{geom_boxplot()} accept
+#' \code{geom_line()}, \code{geom_histogram()}, or \code{geom_boxplot()} accept
 #' can be used. For example, \code{colour = "red"} can be used for any marginal plot type,
 #' and \code{binwidth = 10} can be used for histograms.
 #' @param xparams List of extra parameters to use only for the marginal plot along
 #' the x axis.
 #' @param yparams List of extra parameters to use only for the marginal plot along
 #' the y axis.
-#' @return An object of class ggExtraPlot. This extra class gets added onto
-#' a ggplot2 object in order for the \code{print} generic to easily work with
-#' this object. This means that the return value from this function can be
-#' printed or saved for later.
+#' @return An object of class \code{ggExtraPlot}. This object can be printed to show the
+#' plots or saved using any of the typical image-saving functions (for example, using
+#' \code{png()} or \code{pdf()}).
 #' @note Since the \code{size} parameter is used by \code{ggMarginal}, if you want
 #' to pass a size to the marginal plots, you cannot
 #' use the \code{...} parameter. Instead, you must pass \code{size} to
@@ -39,51 +38,47 @@
 #' while \code{ggMarginal(p, xparams = list(size=2), yparams = list(size=2))}
 #' will make the density plot outline thicker.
 #' @examples
-#' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   if (requireNamespace("gridExtra", quietly = TRUE)) {
-#'     if (requireNamespace("grid", quietly = TRUE)) {
-#'       p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
-#'       ggMarginal(p)
+#' 
+#' # basic usage
+#' p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+#' ggMarginal(p)
 #'       
-#'       set.seed(30)
-#'       df <- data.frame(x = rnorm(500, 50, 10), y = runif(500, 0, 50))
-#'       p2 <- ggplot2::ggplot(df, ggplot2::aes(x, y)) + ggplot2::geom_point()
-#'       ggMarginal(p2)
-#'       ggMarginal(p2, type = "histogram")
-#'       ggMarginal(p2, margins = "x")
-#'       ggMarginal(p2, size = 2)
-#'       ggMarginal(p2, colour = "red")
-#'       ggMarginal(p2, colour = "red", xparams = list(colour = "blue", size = 3))
-#'       p2 <- p2 + ggplot2::ggtitle("Random data") + ggplot2::theme_bw(30)
-#'       ggMarginal(p2)
-#'       
-#'       ggMarginal(data = df, x = "x", y = "y")
-#'       
-#'       set.seed(30)
-#'       df2 <- data.frame(x = c(rnorm(250, 50, 10), rnorm(250, 100, 10)),
-#'                         y = runif(500, 0, 50))
-#'       p3 <- ggplot2::ggplot(df2, ggplot2::aes(x, y)) + ggplot2::geom_point()
-#'       ggMarginal(p3)
-#'     }
-#'   }
-#' }
+#' # using some parameters
+#' set.seed(30)
+#' df <- data.frame(x = rnorm(500, 50, 10), y = runif(500, 0, 50))
+#' p2 <- ggplot2::ggplot(df, ggplot2::aes(x, y)) + ggplot2::geom_point()
+#' ggMarginal(p2)
+#' ggMarginal(p2, type = "histogram")
+#' ggMarginal(p2, margins = "x")
+#' ggMarginal(p2, size = 2)
+#' ggMarginal(p2, colour = "red")
+#' ggMarginal(p2, colour = "red", xparams = list(colour = "blue", size = 3))
+#' ggMarginal(p2, type = "histogram", bins = 10)
+#' 
+#' # specifying the data directly instead of providing a plot       
+#' ggMarginal(data = df, x = "x", y = "y")
+#'
+#' # more examples showing how the marginal plots are properly aligned even when
+#' # the main plot axis/margins/size/etc are changed
+#' set.seed(30)
+#' df2 <- data.frame(x = c(rnorm(250, 50, 10), rnorm(250, 100, 10)),
+#'                   y = runif(500, 0, 50))
+#' p2 <- ggplot2::ggplot(df2, ggplot2::aes(x, y)) + ggplot2::geom_point()
+#' ggMarginal(p2)
+#' 
+#' p2 <- p2 + ggplot2::ggtitle("Random data") + ggplot2::theme_bw(30)
+#' ggMarginal(p2)
+#' 
+#' p3 <- ggplot2::ggplot(df2, ggplot2::aes(log(x), y - 500)) + ggplot2::geom_point()
+#' ggMarginal(p3)
+#' 
+#' p4 <- p3 + ggplot2::scale_x_continuous(limits = c(2, 6)) + ggplot2::theme_bw(50)
+#' ggMarginal(p4)
 #' @seealso \href{http://daattali.com/shiny/ggExtra-ggMarginal-demo/}{Demo Shiny app}
 #' @export
 ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"),
                        margins = c("both", "x", "y"), size = 5,
                        ..., xparams, yparams) {
-
-  # Make sure the required packages are installed
-  reqs <- c("grid", "gridExtra")
-  invisible(
-    lapply(reqs, function(req) {
-      if (!requireNamespace(req, quietly = TRUE)) {
-        stop(sprintf("`%s` package is required for this function to work. Please install it.", req),
-             call. = FALSE)
-      }
-    })
-  )  
-  
   # figure out all the default parameters
   type <- match.arg(type)
   margins <- match.arg(margins)
@@ -96,6 +91,12 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
   if (is.null(extraParams[['fill']])) {
     extraParams[['fill']] <- "grey"
   }
+  
+  # after ggplot2 v1.0.1, layers became strict about parameters
+  if (type == "density") {
+    extraParams[['fill']] <- NULL
+  }
+  
   if (missing(xparams)) {
     xparams <- list()
   } else {
@@ -114,6 +115,8 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
            call. = FALSE)
     }
     p <- ggplot2::ggplot(data, ggplot2::aes_string(x, y)) + ggplot2::geom_point()
+    x <- as.symbol(x)
+    y <- as.symbol(y)
   } else {
     if (missing(data)) {
       if (methods::is(p$data, "waiver")) {
@@ -127,39 +130,48 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
         stop("`x` must be provided if it is not an aesthetic of the main ggplot object",
              call. = FALSE)
       }
-      x <- as.character(p$mapping$x)
+      x <- p$mapping$x
     }
     if (margins != "x" && missing(y)) {
       if (is.null(p$mapping$y)) {
         stop("`y` must be provided if it is not an aesthetic of the main ggplot object",
              call. = FALSE)
       }
-      y <- as.character(p$mapping$y)
+      y <- p$mapping$y
     }
   }
-
+  
+  # rename the x and y variables just so it's easier to debug
+  if (!missing(x)) xvar <- x
+  if (!missing(y)) yvar <- y
+  
   # Remove all margin around plot so that it's easier to position the
   # density plots beside the main plot
-  p <- p + ggplot2::theme(plot.margin = grid::unit(c(0, 0, 0, 0), "mm"))
+  p <- p + ggplot2::theme(plot.margin = grid::unit(c(0, 0, 0, 0), "null"))
 
   # Decompose the original ggplot2 object to grab all sorts of information from it
   pb <- ggplot2::ggplot_build(p)
-  
-  textsize <- p$theme$text$size
 
-  # get the common code for both maginal (x and y) plots
+  # get the common code for both marginal (x and y) plots
   marginPlot <- function(margin) {
+    aest <- ggplot2::aes()
     if (margin == "x") {
       if (type == "boxplot") {
-        plot <- ggplot2::ggplot(data, ggplot2::aes_string(x, x)) + ggplot2::coord_flip()
+        aest[['x']] <- xvar
+        aest[['y']] <- xvar
+        plot <- ggplot2::ggplot(data, aest) + ggplot2::coord_flip()
       } else {
-        plot <- ggplot2::ggplot(data, ggplot2::aes_string(x))
+        aest[['x']] <- xvar
+        plot <- ggplot2::ggplot(data, aest)
       }
     } else if (margin == "y") {
       if (type == "boxplot") {
-        plot <- ggplot2::ggplot(data, ggplot2::aes_string(y, y))
+        aest[['x']] <- yvar
+        aest[['y']] <- yvar
+        plot <- ggplot2::ggplot(data, aest)
       } else {
-        plot <- ggplot2::ggplot(data, ggplot2::aes_string(y)) + ggplot2::coord_flip()
+        aest[['x']] <- yvar
+        plot <- ggplot2::ggplot(data, aest) + ggplot2::coord_flip()
       }
     } else {
       stop(sprintf("`margin` = `%s` is not supported", margin), call. = FALSE)
@@ -180,7 +192,7 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
       extraParams[['stat']] <- "density"
       layer <- do.call(ggplot2::geom_line, extraParams)
     } else if (type == "histogram") {
-      layer <- do.call(ggplot2::geom_bar, extraParams)
+      layer <- do.call(ggplot2::geom_histogram, extraParams)
     } else if (type == "boxplot") {
       layer <- do.call(ggplot2::geom_boxplot, extraParams)
     } else {
@@ -190,10 +202,108 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
     plot + layer
   }  
   
+  # given a plot, copy some theme properties from the main plot so that they will
+  # resemble each other more and look better beside each other, and also add
+  # some common theme properties such as 0 margins and transparent text colour
+  addMainTheme <- function(marginal, margin) {
+    if (utils::packageVersion("ggplot2") > "1.0.1") {
+      # copy theme from main plot
+      themeProps <- c("text",
+                      "axis.text","axis.text.x", "axis.text.y",
+                      "axis.ticks", "axis.ticks.length",
+                      "axis.title", "axis.title.x", "axis.title.y",
+                      "plot.title"
+                    )
+      for(property in themeProps) {
+        marginal$theme[[property]] <- p$theme[[property]]
+      }
+      
+      # make text and line colours transparent
+      transparentProps <- c("text",
+                            "axis.text", "axis.text.x", "axis.text.y",
+                            "axis.ticks",
+                            "axis.title", "axis.title.x", "axis.title.y",
+                            "line")
+      for(property in transparentProps) {
+        if (!is.null(marginal$theme[[property]])) {
+          marginal$theme[[property]]$colour <- "transparent"
+        } else if (property %in% c("axis.ticks", "line")) {
+          themePair <- list()
+          themePair[[property]] <- ggplot2::element_line(colour = "transparent")
+          marginal <- marginal + do.call(ggplot2::theme, themePair)
+        } else {
+          themePair <- list()
+          themePair[[property]] <- ggplot2::element_text(colour = "transparent")
+          marginal <- marginal + do.call(ggplot2::theme, themePair)
+        }
+      }
+      
+      # some more theme properties
+      marginal <- marginal +
+        ggplot2::theme(
+          panel.background = ggplot2::element_blank(),
+          axis.ticks.length = grid::unit(0, "null")
+        )
+      
+      # since the tick marks are removed on the marginal plot, we need to add
+      # space for them so that the marginal plot will align with the main plot
+      if (is.null(p$theme$axis.ticks.length)) {
+        marginUnit <- "null"
+        marginLength <- 0
+      } else {
+        marginUnit <- attr(p$theme$axis.ticks.length, "unit")
+        marginLength <- as.numeric(p$theme$axis.ticks.length, "unit")
+      }
+      if (margin == "x") {
+        marginal <- marginal + 
+          ggplot2::theme(
+            axis.title.x = ggplot2::element_blank(),
+            axis.text.x = ggplot2::element_blank(),
+            plot.margin = grid::unit(c(0, 0, 0, marginLength), marginUnit)
+          )
+      } else {
+        marginal <- marginal + 
+          ggplot2::theme(
+            axis.title.y = ggplot2::element_blank(),
+            axis.text.y = ggplot2::element_blank(),
+            plot.margin = grid::unit(c(0, 0, marginLength, 0), marginUnit)
+          )
+      }
+    }
+    # if this is the old ggplot2 version, things are simpler
+    else {
+      marginal <- marginal +
+        ggplot2::theme(
+          text = ggplot2::element_text(size = p$theme$text$size, color = "transparent"),
+          line = ggplot2::element_blank(),
+          panel.background = ggplot2::element_blank(),
+          axis.text = ggplot2::element_text(color = "transparent")
+        )
+
+      if (margin == "x") {
+        marginal <- marginal + 
+          ggplot2::theme(
+            axis.title.x = ggplot2::element_blank(),
+            axis.text.x = ggplot2::element_blank(),
+            plot.margin = grid::unit(c(0, 0, -1, 0), "lines")
+          )
+      } else {
+        marginal <- marginal + 
+          ggplot2::theme(
+            axis.title.y = ggplot2::element_blank(),
+            axis.text.y = ggplot2::element_blank(),
+            plot.margin = grid::unit(c(0, 0, 0, -1), "lines")
+          )
+      }
+    }
+    
+    marginal
+  }
+  
   # Copy the scale transformation from the original plot (reverse/log/limits/etc)
   # We have to do a bit of a trick on the marginal plot that's flipped by
   # taking the original x/y scale and manually changing it to the other axis
-  get_scale <- function(margin) {
+  getScale <- function(margin) {
     if (margin == "x") {
       if (type == "boxplot") {
         scale <- pb$panel$x_scales[[1]]
@@ -215,7 +325,7 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
   # Get the axis range of the x or y axis of the given ggplot build object
   # This is needed so that if the range of the plot is manually changed, the
   # marginal plots will use the same range
-  get_limits <- function(pb, margin) {
+  getLimits <- function(pb, margin) {
     if (margin == "x") {
       scales <- pb$panel$x_scales[[1]]
     } else if (margin == "y") {
@@ -229,7 +339,7 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
       range <- scales$range$range
     }
     range
-  }  
+  }
   
   # Create the horizontal margin plot
   # In order to ensure the marginal plots line up nicely with the main plot,
@@ -243,18 +353,11 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
   # - Use the same axis titles as the main plot, to ensure the same space is taken
   # - Use the same axis range as the main plot
   if (margins != "y") {
-    top <-
-      marginPlot("x") + 
-      ggplot2::theme(
-        text = ggplot2::element_text(size = textsize, color = "transparent"),
-        line = ggplot2::element_blank(),
-        panel.background = ggplot2::element_blank(),
-        axis.text = ggplot2::element_text(color = "transparent"),
-        axis.title.x = ggplot2::element_blank(),
-        axis.text.x = ggplot2::element_blank(),
-        plot.margin = grid::unit(c(0, 0, -1, 0), "lines")) +
+    top <- marginPlot("x")
+    top <- addMainTheme(top, "x")
+    top <- top +
       ggplot2::ylab(p$labels$y) +
-      get_scale("x")
+      getScale("x")
     
     # Add the longest y axis label to the top plot and ensure it's at a y value
     # that is on the plot (this is why I build the top plot, to know the y values)
@@ -264,46 +367,26 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
     if (type == "boxplot") {
       top <-
         top +
-        ggplot2::scale_x_continuous(breaks = mean(get_limits(pbTop, "x")),
+        ggplot2::scale_x_continuous(breaks = mean(getLimits(pbTop, "x")),
                                     labels = ylabel)      
     } else {
       top <-
         top +
-        ggplot2::scale_y_continuous(breaks = mean(get_limits(pbTop, "y")),
+        ggplot2::scale_y_continuous(breaks = mean(getLimits(pbTop, "y")),
                                     labels = ylabel)      
-    }
-
-    
-    # If we are showing a marginal plot above the main plot, then transfer the
-    # plot title to be above the marginal plot
-    # TODO(daattali) This doesn't quite work right because the title is taking
-    # a lot of vertical real estate from the short marginal plot. It needs to
-    # go above the marginal plot without affecting its height.
-    if (FALSE) {
-      if (!is.null(pb$plot$labels$title)) {
-        top <- top + ggplot2::ggtitle(pb$plot$labels$title)
-        p <- p + ggplot2::ggtitle("")
-      }
     }
   }
 
   # Create the vertical margin plot
   if (margins != "x") {
-    right <-
-      marginPlot("y") + 
-      ggplot2::theme(
-        text = ggplot2::element_text(size = textsize, color = "transparent"),
-        line = ggplot2::element_blank(),
-        panel.background = ggplot2::element_blank(),
-        axis.text = ggplot2::element_text(color = "transparent"),
-        axis.title.y = ggplot2::element_blank(),
-        axis.text.y = ggplot2::element_blank(),
-        plot.margin = grid::unit(c(0, 0, 0, -1), "lines")) +
+    right <- marginPlot("y")
+    right <- addMainTheme(right, "y")
+    right <- right +
       ggplot2::ylab(p$labels$x) +
-      get_scale("y") +
+      getScale("y") +
       ggplot2::ggtitle(p$labels$title)
   }
-
+  
   # Build a 2x2 or 2x1 grid to arrange the plots  
   ncol <- 2
   nrow <- 2
@@ -345,7 +428,10 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
   # More info: http://stackoverflow.com/questions/29062766/store-output-from-gridextragrid-arrange-into-an-object
   
   # Build the grid of plots
-  plot <- do.call(gridExtra::arrangeGrob, gridArgs)
+  suppressMessages(
+    # use suppressMessages to ignore message about adding multiple scales
+    plot <- do.call(gridExtra::arrangeGrob, gridArgs)
+  )
   class(plot) <- c("ggExtraPlot", class(plot))
   plot
 }
@@ -360,6 +446,7 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
 #' @param ... ignored
 #' @seealso \code{\link{ggMarginal}}
 #' @export
+#' @keywords internal
 print.ggExtraPlot <- function(x, ...) {
   grid::grid.newpage()
   grid::grid.draw(x)

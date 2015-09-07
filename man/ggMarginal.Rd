@@ -30,7 +30,7 @@ compared to the main plot. A size of 5 means that the main plot is 5x wider
 and 5x taller than the marginal plots.}
 
 \item{...}{Extra parameters to pass to the marginal plots. Any parameter that
-\code{geom_line()}, \code{geom_bar()}, or \code{geom_boxplot()} accept
+\code{geom_line()}, \code{geom_histogram()}, or \code{geom_boxplot()} accept
 can be used. For example, \code{colour = "red"} can be used for any marginal plot type,
 and \code{binwidth = 10} can be used for histograms.}
 
@@ -41,10 +41,9 @@ the x axis.}
 the y axis.}
 }
 \value{
-An object of class ggExtraPlot. This extra class gets added onto
-a ggplot2 object in order for the \code{print} generic to easily work with
-this object. This means that the return value from this function can be
-printed or saved for later.
+An object of class \code{ggExtraPlot}. This object can be printed to show the
+plots or saved using any of the typical image-saving functions (for example, using
+\code{png()} or \code{pdf()}).
 }
 \description{
 Create a ggplot2 scatterplot with marginal density plots (default) or
@@ -63,34 +62,41 @@ while \code{ggMarginal(p, xparams = list(size=2), yparams = list(size=2))}
 will make the density plot outline thicker.
 }
 \examples{
-if (requireNamespace("ggplot2", quietly = TRUE)) {
-  if (requireNamespace("gridExtra", quietly = TRUE)) {
-    if (requireNamespace("grid", quietly = TRUE)) {
-      p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
-      ggMarginal(p)
+# basic usage
+p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+ggMarginal(p)
 
-      set.seed(30)
-      df <- data.frame(x = rnorm(500, 50, 10), y = runif(500, 0, 50))
-      p2 <- ggplot2::ggplot(df, ggplot2::aes(x, y)) + ggplot2::geom_point()
-      ggMarginal(p2)
-      ggMarginal(p2, type = "histogram")
-      ggMarginal(p2, margins = "x")
-      ggMarginal(p2, size = 2)
-      ggMarginal(p2, colour = "red")
-      ggMarginal(p2, colour = "red", xparams = list(colour = "blue", size = 3))
-      p2 <- p2 + ggplot2::ggtitle("Random data") + ggplot2::theme_bw(30)
-      ggMarginal(p2)
+# using some parameters
+set.seed(30)
+df <- data.frame(x = rnorm(500, 50, 10), y = runif(500, 0, 50))
+p2 <- ggplot2::ggplot(df, ggplot2::aes(x, y)) + ggplot2::geom_point()
+ggMarginal(p2)
+ggMarginal(p2, type = "histogram")
+ggMarginal(p2, margins = "x")
+ggMarginal(p2, size = 2)
+ggMarginal(p2, colour = "red")
+ggMarginal(p2, colour = "red", xparams = list(colour = "blue", size = 3))
+ggMarginal(p2, type = "histogram", bins = 10)
 
-      ggMarginal(data = df, x = "x", y = "y")
+# specifying the data directly instead of providing a plot
+ggMarginal(data = df, x = "x", y = "y")
 
-      set.seed(30)
-      df2 <- data.frame(x = c(rnorm(250, 50, 10), rnorm(250, 100, 10)),
-                        y = runif(500, 0, 50))
-      p3 <- ggplot2::ggplot(df2, ggplot2::aes(x, y)) + ggplot2::geom_point()
-      ggMarginal(p3)
-    }
-  }
-}
+# more examples showing how the marginal plots are properly aligned even when
+# the main plot axis/margins/size/etc are changed
+set.seed(30)
+df2 <- data.frame(x = c(rnorm(250, 50, 10), rnorm(250, 100, 10)),
+                  y = runif(500, 0, 50))
+p2 <- ggplot2::ggplot(df2, ggplot2::aes(x, y)) + ggplot2::geom_point()
+ggMarginal(p2)
+
+p2 <- p2 + ggplot2::ggtitle("Random data") + ggplot2::theme_bw(30)
+ggMarginal(p2)
+
+p3 <- ggplot2::ggplot(df2, ggplot2::aes(log(x), y - 500)) + ggplot2::geom_point()
+ggMarginal(p3)
+
+p4 <- p3 + ggplot2::scale_x_continuous(limits = c(2, 6)) + ggplot2::theme_bw(50)
+ggMarginal(p4)
 }
 \seealso{
 \href{http://daattali.com/shiny/ggExtra-ggMarginal-demo/}{Demo Shiny app}

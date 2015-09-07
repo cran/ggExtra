@@ -22,10 +22,10 @@ ggMarginal(p1)
 ## ----ggmarginal-large----------------------------------------------------
 ggMarginal(p1 + theme_bw(30) + ylab("Two\nlines"))
 
-## ----ggmarginal-hist-----------------------------------------------------
+## ----ggmarginal-hist, message=FALSE--------------------------------------
 ggMarginal(p1, type = "histogram")
 
-## ----ggmarginal-params---------------------------------------------------
+## ----ggmarginal-params, message=FALSE------------------------------------
 ggMarginal(p1, margins = "x", size = 2, type = "histogram",
            col = "blue", fill = "orange")
 
