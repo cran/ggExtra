@@ -183,9 +183,19 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
     if (margin == "x") {
       extraParams <- append(xparams, extraParams)
       extraParams <- extraParams[!duplicated(names(extraParams))]
+      if (type == "histogram") {
+        if (!is.null(pb$panel$x_scales[[1]]$get_limits)) {
+          extraParams[['origin']] <- pb$panel$x_scales[[1]]$get_limits()[1]
+        }
+      }
     } else if (margin == "y") {
       extraParams <- append(yparams, extraParams)
       extraParams <- extraParams[!duplicated(names(extraParams))]
+      if (type == "histogram") {
+        if (!is.null(pb$panel$y_scales[[1]]$get_limits)) {
+          extraParams[['origin']] <- pb$panel$y_scales[[1]]$get_limits()[1]
+        }
+      }      
     }
     
     if (type == "density") {
@@ -308,12 +318,14 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
       if (type == "boxplot") {
         scale <- pb$panel$x_scales[[1]]
         scale$aesthetics <- gsub("^x", "y", scale$aesthetics)
+        scale$limits <- pb$panel$x_scales[[1]]$get_limits()
       } else {
         scale <- pb$panel$x_scales[[1]]
       }
     } else if (margin == "y") { 
       if (type == "boxplot") {
         scale <- pb$panel$y_scales[[1]]
+        scale$limits <- pb$panel$y_scales[[1]]$get_limits()
       } else {
         scale <- pb$panel$y_scales[[1]]
         scale$aesthetics <- gsub("^y", "x", scale$aesthetics)
@@ -358,7 +370,7 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
     top <- top +
       ggplot2::ylab(p$labels$y) +
       getScale("x")
-    
+  
     # Add the longest y axis label to the top plot and ensure it's at a y value
     # that is on the plot (this is why I build the top plot, to know the y values)
     pbTop <- ggplot2::ggplot_build(top)
@@ -383,32 +395,49 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
     right <- addMainTheme(right, "y")
     right <- right +
       ggplot2::ylab(p$labels$x) +
-      getScale("y") +
-      ggplot2::ggtitle(p$labels$title)
-  }
-  
-  # Build a 2x2 or 2x1 grid to arrange the plots  
-  ncol <- 2
-  nrow <- 2
-  if (margins == "both") {
-    empty <- grid::grid.rect(gp = grid::gpar(col = "transparent"), draw = FALSE)
-    plots <- list(top, empty, p, right)
-  } else if (margins == "x") {
-    plots <- list(top, p)
-    ncol <- 1
-  } else if (margins == "y") {
-    plots <- list(p, right)
-    nrow <- 1
-  }
-  # Determine all the arguments to build the grid (dimensions, plots, plot sizes)
-  gridArgs <- c(plots, ncol = ncol, nrow = nrow)
-  if (margins != "x") {
-    gridArgs <- c(gridArgs, widths = list(grid::unit(c(size, 1), "null")))
-  }
-  if (margins != "y") {
-    gridArgs <- c(gridArgs, heights = list(grid::unit(c(1, size), "null")))
+      getScale("y")
   }
 
+  # Build a 2x2 grid for the scatterplot with marginal plots,
+  # with an extra row for the title
+  ncol <- 2
+  nrow <- 3
+  titleSize <- 1
+  rowSize <- 1
+  colSize <- 1
+
+  # Build the grid of grobs
+  empty <- grid::grid.rect(gp = grid::gpar(col = "transparent"), draw = FALSE)
+  if (!is.null(pb$plot$labels$title)) {
+    title <- grid::textGrob(
+      pb$plot$labels$title,
+      gp = grid::gpar(col = pb$plot$theme$plot.title$colour,
+                      fontsize = 16)
+    )
+    p$labels$title <- NULL
+  } else {
+    title <- empty
+    titleSize <- 0
+  }
+  
+  
+  if (margins == "both") {
+    plots <- list(title, empty, top, empty, p, right)
+  } else if (margins == "x") {
+    plots <- list(title, empty, top, empty, p, empty)
+    colSize <- 0
+  } else if (margins == "y") {
+    plots <- list(title, empty, empty, empty, p, right)
+    rowSize <- 0
+  }
+  
+  # Determine all the arguments to build the grid (dimensions, plots, plot sizes)
+  gridArgs <- c(plots, ncol = ncol, nrow = nrow)
+  gridArgs <- c(gridArgs,
+                widths = list(grid::unit(c(size, colSize), "null")),
+                heights = list(grid::unit(c(titleSize, rowSize, size), "null"))
+              )
+  
   # NOTE: This ugly hack is here because of a bug in gridExtra which calls
   # a ggplot2 function directly instead of namespacing it.  The bug is fixed
   # in the gridExtra GitHub version, but not on CRAN. Hopefully gridExtra
@@ -419,7 +448,7 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
     on.exit(detach("package:ggplot2"))
   }
   
-  # NOTE: I had use arrangeGrob instead of grid.arrange because the latter does
+  # NOTE: I had to use arrangeGrob instead of grid.arrange because the latter does
   # not allow saving the object, it only works as a side-effect and returns NULL.
   # There were still problems with arrangeGrob - if gridExtra isn't loaded, I
   # would get "No layers in plot" error. I noticed that calling grid::grid.draw 
@@ -428,10 +457,10 @@ ggMarginal <- function(p, data, x, y, type = c("density", "histogram", "boxplot"
   # More info: http://stackoverflow.com/questions/29062766/store-output-from-gridextragrid-arrange-into-an-object
   
   # Build the grid of plots
-  suppressMessages(
+  suppressMessages(suppressWarnings(
     # use suppressMessages to ignore message about adding multiple scales
     plot <- do.call(gridExtra::arrangeGrob, gridArgs)
-  )
+  ))
   class(plot) <- c("ggExtraPlot", class(plot))
   plot
 }

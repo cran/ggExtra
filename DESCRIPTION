@@ -1,7 +1,7 @@
 Package: ggExtra
 Title: Add Marginal Histograms to 'ggplot2', and More 'ggplot2'
         Enhancements
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: c(
     person("Dean", "Attali", , "daattali@gmail.com", role = c("aut", "cre"))
     )
@@ -18,8 +18,8 @@ License: MIT + file LICENSE
 LazyData: true
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2015-09-06 19:45:26 UTC; Dean
+Packaged: 2015-11-06 19:04:53 UTC; Dean
 Author: Dean Attali [aut, cre]
 Maintainer: Dean Attali <daattali@gmail.com>
 Repository: CRAN
-Date/Publication: 2015-09-07 00:40:10
+Date/Publication: 2015-11-07 07:24:11
