@@ -1,3 +1,15 @@
+# ggExtra 0.3.3
+
+2015-12-14
+
+- Small UI changes to the Shiny app demo
+
+# ggExtra 0.3.2
+
+2015-11-10
+
+- Fixed bug where using `ggplot2::set_theme()` was causing the marginal plots to also use that theme
+
 # ggExtra 0.3.1
 
 2015-11-05
