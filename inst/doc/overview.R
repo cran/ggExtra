@@ -5,7 +5,7 @@ knitr::opts_chunk$set(tidy = FALSE, comment = "#>", fig.width = 6,
 # because it looks like GitHub markdown doesn't suppport this)
 #knitr::opts_knit$set(upload.fun = knitr::image_uri)
 
-## ----load-pkg------------------------------------------------------------
+## ----load-pkg, warning=FALSE---------------------------------------------
 suppressPackageStartupMessages({
   library("ggExtra")
   library("ggplot2")
