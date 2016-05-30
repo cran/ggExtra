@@ -1,3 +1,19 @@
+# ggExtra 0.5 2016-05-29
+
+- ggMarginal now supports plots with legends (thanks to @crew102) (#23)
+
+# ggExtra 0.4.2
+
+2016-04-30
+
+- ggMarginal addin now works on all screen resolutions (#24)
+
+# ggExtra 0.4.1
+
+2016-04-24
+
+- Remove hack required by old version of `gridExtra`
+
 # ggExtra 0.4.0
 
 2016-03-25
