@@ -1,3 +1,16 @@
+# ggExtra 0.8
+
+NEW FEATURES
+
+- Added support for violin plots (#62)
+- Added support for mapping colour from the scatter plot to colour/fill in the marginal plots (#61)
+
+BUX FIXES
+
+- Make sure marginal data comes from correct data frame (#67) 
+- Fix #81: many issues when the x or y axis have custom scales applied (#101)
+- Fix #99: plot subtitle was in the wrong position when no title was used (#103)
+
 # ggExtra 0.7
 
 2017-06-21

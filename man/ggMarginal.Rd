@@ -4,9 +4,10 @@
 \alias{ggMarginal}
 \title{Add marginal density/histogram to ggplot2 scatterplots}
 \usage{
-ggMarginal(p, data, x, y, type = c("density", "histogram", "boxplot"),
-  margins = c("both", "x", "y"), size = 5, ..., xparams = list(),
-  yparams = list())
+ggMarginal(p, data, x, y, type = c("density", "histogram", "boxplot",
+  "violin"), margins = c("both", "x", "y"), size = 5, ...,
+  xparams = list(), yparams = list(), groupColour = FALSE,
+  groupFill = FALSE)
 }
 \arguments{
 \item{p}{A ggplot2 scatterplot to add marginal plots to.  If \code{p} is
@@ -22,7 +23,7 @@ provided and the \code{x} aesthetic is set in the main plot.}
 \item{y}{The name of the variable along the y axis. Optional if \code{p} is
 provided and the \code{y} aesthetic is set in the main plot.}
 
-\item{type}{What type of marginal plot to show. One of: [density, histogram, boxplot].}
+\item{type}{What type of marginal plot to show. One of: [density, histogram, boxplot, violin].}
 
 \item{margins}{Along which margins to show the plots. One of: [both, x, y].}
 
@@ -31,7 +32,7 @@ compared to the main plot. A size of 5 means that the main plot is 5x wider
 and 5x taller than the marginal plots.}
 
 \item{...}{Extra parameters to pass to the marginal plots. Any parameter that
-\code{geom_line()}, \code{geom_histogram()}, or \code{geom_boxplot()} accepts
+\code{geom_line()}, \code{geom_histogram()}, \code{geom_boxplot()}, or \code{geom_violin()} accepts
 can be used. For example, \code{colour = "red"} can be used for any marginal plot type,
 and \code{binwidth = 10} can be used for histograms.}
 
@@ -40,6 +41,16 @@ the x axis.}
 
 \item{yparams}{List of extra parameters to use only for the marginal plot along
 the y axis.}
+
+\item{groupColour}{If \code{TRUE}, the colour (or outline) of the marginal
+plots will be grouped according to the variable mapped to \code{colour} in the
+scatter plot. The variable mapped to \code{colour} in the scatter plot must
+be a character or factor variable. See examples below.}
+
+\item{groupFill}{If \code{TRUE}, the fill of the marginal
+plots will be grouped according to the variable mapped to \code{colour} in the
+scatter plot. The variable mapped to \code{colour} in the scatter plot must
+be a character or factor variable. See examples below.}
 }
 \value{
 An object of class \code{ggExtraPlot}. This object can be printed to show the
@@ -47,7 +58,7 @@ plots or saved using any of the typical image-saving functions (for example, usi
 \code{png()} or \code{pdf()}).
 }
 \description{
-Create a ggplot2 scatterplot with marginal density plots (default) or 
+Create a ggplot2 scatterplot with marginal density plots (default) or
 histograms, or add the marginal plots to an existing scatterplot.
 }
 \note{
@@ -63,15 +74,16 @@ while \code{ggMarginal(p, xparams = list(size=2), yparams = list(size=2))}
 will make the density plot outline thicker.
 }
 \examples{
+library(ggplot2)
 
 # basic usage
-p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) + ggplot2::geom_point()
+p <- ggplot(mtcars, aes(wt, mpg)) + geom_point()
 ggMarginal(p)
-      
+
 # using some parameters
 set.seed(30)
 df <- data.frame(x = rnorm(500, 50, 10), y = runif(500, 0, 50))
-p2 <- ggplot2::ggplot(df, ggplot2::aes(x, y)) + ggplot2::geom_point()
+p2 <- ggplot(df, aes(x, y)) + geom_point()
 ggMarginal(p2)
 ggMarginal(p2, type = "histogram")
 ggMarginal(p2, margins = "x")
@@ -80,7 +92,10 @@ ggMarginal(p2, colour = "red")
 ggMarginal(p2, colour = "red", xparams = list(colour = "blue", size = 3))
 ggMarginal(p2, type = "histogram", bins = 10)
 
-# specifying the data directly instead of providing a plot       
+# Using violin plot
+ggMarginal(p2, type = "violin")
+
+# specifying the data directly instead of providing a plot
 ggMarginal(data = df, x = "x", y = "y")
 
 # more examples showing how the marginal plots are properly aligned even when
@@ -88,17 +103,26 @@ ggMarginal(data = df, x = "x", y = "y")
 set.seed(30)
 df2 <- data.frame(x = c(rnorm(250, 50, 10), rnorm(250, 100, 10)),
                   y = runif(500, 0, 50))
-p2 <- ggplot2::ggplot(df2, ggplot2::aes(x, y)) + ggplot2::geom_point()
+p2 <- ggplot(df2, aes(x, y)) + geom_point()
 ggMarginal(p2)
 
-p2 <- p2 + ggplot2::ggtitle("Random data") + ggplot2::theme_bw(30)
+p2 <- p2 + ggtitle("Random data") + theme_bw(30)
 ggMarginal(p2)
 
-p3 <- ggplot2::ggplot(df2, ggplot2::aes(log(x), y - 500)) + ggplot2::geom_point()
+p3 <- ggplot(df2, aes(log(x), y - 500)) + geom_point()
 ggMarginal(p3)
 
-p4 <- p3 + ggplot2::scale_x_continuous(limits = c(2, 6)) + ggplot2::theme_bw(50)
+p4 <- p3 + scale_x_continuous(limits = c(2, 6)) + theme_bw(50)
 ggMarginal(p4)
+
+# Using groupColour and groupFill
+# In order to use either of these arguments, we must map 'colour' in the
+# scatter plot to a factor or character variable
+p <- ggplot(mtcars, aes(x = wt, y = drat, colour = factor(vs))) +
+     geom_point()
+ggMarginal(p, groupColour = TRUE)
+ggMarginal(p, groupColour = TRUE, groupFill = TRUE)
+
 }
 \seealso{
 \href{http://daattali.com/shiny/ggExtra-ggMarginal-demo/}{Demo Shiny app}

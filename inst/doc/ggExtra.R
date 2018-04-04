@@ -5,22 +5,26 @@ knitr::opts_chunk$set(tidy = FALSE, comment = "#>", fig.width = 6,
 # because it looks like GitHub markdown doesn't suppport this)
 #knitr::opts_knit$set(upload.fun = knitr::image_uri)
 
-## ----load-pkg, warning=FALSE---------------------------------------------
-suppressPackageStartupMessages({
-  library("ggExtra")
-  library("ggplot2")
-})
+## ----load-pkg, warning=FALSE, message=FALSE------------------------------
+library("ggExtra")
+library("ggplot2")
 
 ## ----init-plot-----------------------------------------------------------
 set.seed(30)
 df1 <- data.frame(x = rnorm(500, 50, 10), y = runif(500, 0, 50))
-(p1 <- ggplot(df1, aes(x, y)) + geom_point() + theme_bw())
+p1 <- ggplot(df1, aes(x, y)) + geom_point() + theme_bw()
+p1
 
 ## ----ggmarginal-basic----------------------------------------------------
 ggMarginal(p1)
 
 ## ----ggmarginal-large----------------------------------------------------
 ggMarginal(p1 + theme_bw(30) + ylab("Two\nlines"))
+
+## ----ggmarginal-grouping, message=FALSE----------------------------------
+piris <- ggplot(iris, aes(Sepal.Length, Sepal.Width, colour = Species)) +
+  geom_point()
+ggMarginal(piris, groupColour = TRUE, groupFill = TRUE)
 
 ## ----ggmarginal-hist, message=FALSE--------------------------------------
 ggMarginal(p1, type = "histogram")
