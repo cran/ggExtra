@@ -36,9 +36,6 @@ ggMarginal(p1, margins = "x", size = 2, type = "histogram",
 ## ----ggmarginal-extraparams----------------------------------------------
 ggMarginal(p1, type = "histogram", xparams = list(binwidth = 1, fill = "orange"))
 
-## ----ggmarginal-manual---------------------------------------------------
-ggMarginal(data = mtcars, x = "wt", y = "mpg")
-
 ## ----ggmarginal-save-----------------------------------------------------
 p <- ggMarginal(p1)
 p

@@ -5,12 +5,12 @@
 \title{Add marginal density/histogram to ggplot2 scatterplots}
 \usage{
 ggMarginal(p, data, x, y, type = c("density", "histogram", "boxplot",
-  "violin"), margins = c("both", "x", "y"), size = 5, ...,
+  "violin", "densigram"), margins = c("both", "x", "y"), size = 5, ...,
   xparams = list(), yparams = list(), groupColour = FALSE,
   groupFill = FALSE)
 }
 \arguments{
-\item{p}{A ggplot2 scatterplot to add marginal plots to.  If \code{p} is
+\item{p}{A ggplot2 scatterplot to add marginal plots to. If \code{p} is
 not provided, then all of \code{data}, \code{x}, and \code{y} must be
 provided.}
 
@@ -23,7 +23,8 @@ provided and the \code{x} aesthetic is set in the main plot.}
 \item{y}{The name of the variable along the y axis. Optional if \code{p} is
 provided and the \code{y} aesthetic is set in the main plot.}
 
-\item{type}{What type of marginal plot to show. One of: [density, histogram, boxplot, violin].}
+\item{type}{What type of marginal plot to show. One of: [density, histogram, boxplot, violin, densigram] 
+(a "densigram" is when a density plot is overlaid on a histogram).}
 
 \item{margins}{Along which margins to show the plots. One of: [both, x, y].}
 
@@ -74,6 +75,7 @@ while \code{ggMarginal(p, xparams = list(size=2), yparams = list(size=2))}
 will make the density plot outline thicker.
 }
 \examples{
+\dontrun{
 library(ggplot2)
 
 # basic usage
@@ -94,6 +96,9 @@ ggMarginal(p2, type = "histogram", bins = 10)
 
 # Using violin plot
 ggMarginal(p2, type = "violin")
+
+# Using a "densigram" plot
+ggMarginal(p2, type = "densigram")
 
 # specifying the data directly instead of providing a plot
 ggMarginal(data = df, x = "x", y = "y")
@@ -122,6 +127,7 @@ p <- ggplot(mtcars, aes(x = wt, y = drat, colour = factor(vs))) +
      geom_point()
 ggMarginal(p, groupColour = TRUE)
 ggMarginal(p, groupColour = TRUE, groupFill = TRUE)
+}
 
 }
 \seealso{
