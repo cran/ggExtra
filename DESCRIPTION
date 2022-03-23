@@ -1,7 +1,7 @@
 Package: ggExtra
 Title: Add Marginal Histograms to 'ggplot2', and More 'ggplot2'
         Enhancements
-Version: 0.9
+Version: 0.10.0
 Authors@R: c(
     person("Dean", "Attali", , "daattali@gmail.com", role = c("aut", "cre")),
     person("Christopher", "Baker", , "chriscrewbaker@gmail.com", role = "aut")
@@ -16,16 +16,15 @@ Imports: colourpicker (>= 1.0), ggplot2 (>= 2.2.0), grDevices, grid (>=
         3.1.3), gtable (>= 0.2.0), miniUI (>= 0.1.1), scales (>=
         0.2.0), shiny (>= 0.13.0), shinyjs (>= 0.5.2), utils, R6
 Suggests: knitr (>= 1.7), rmarkdown, rstudioapi (>= 0.5), testthat,
-        vdiffr, fontquiver, svglite, withr, devtools
+        vdiffr, fontquiver, shinydisconnect, svglite, withr, devtools
 License: MIT + file LICENSE
 SystemRequirements: pandoc with https support
-LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.2
 NeedsCompilation: no
-Packaged: 2019-08-27 01:18:45 UTC; Dean
+Packaged: 2022-03-23 14:54:41 UTC; Dean-X1C
 Author: Dean Attali [aut, cre],
   Christopher Baker [aut]
 Maintainer: Dean Attali <daattali@gmail.com>
 Repository: CRAN
-Date/Publication: 2019-08-27 04:30:02 UTC
+Date/Publication: 2022-03-23 16:50:02 UTC

@@ -4,26 +4,36 @@
 \alias{ggMarginal}
 \title{Add marginal density/histogram to ggplot2 scatterplots}
 \usage{
-ggMarginal(p, data, x, y, type = c("density", "histogram", "boxplot",
-  "violin", "densigram"), margins = c("both", "x", "y"), size = 5, ...,
-  xparams = list(), yparams = list(), groupColour = FALSE,
-  groupFill = FALSE)
+ggMarginal(
+  p,
+  data,
+  x,
+  y,
+  type = c("density", "histogram", "boxplot", "violin", "densigram"),
+  margins = c("both", "x", "y"),
+  size = 5,
+  ...,
+  xparams = list(),
+  yparams = list(),
+  groupColour = FALSE,
+  groupFill = FALSE
+)
 }
 \arguments{
 \item{p}{A ggplot2 scatterplot to add marginal plots to. If \code{p} is
 not provided, then all of \code{data}, \code{x}, and \code{y} must be
 provided.}
 
-\item{data}{The data.frame to use for creating the marginal plots. Optional
-if \code{p} is provided and the marginal plots are reflecting the same data.}
+\item{data}{The data.frame to use for creating the marginal plots. Ignored
+if \code{p} is provided.}
 
-\item{x}{The name of the variable along the x axis. Optional if \code{p} is
-provided and the \code{x} aesthetic is set in the main plot.}
+\item{x}{The name of the variable along the x axis. Ignored if \code{p} is
+provided.}
 
-\item{y}{The name of the variable along the y axis. Optional if \code{p} is
-provided and the \code{y} aesthetic is set in the main plot.}
+\item{y}{The name of the variable along the y axis. Ignored if \code{p} is
+provided.}
 
-\item{type}{What type of marginal plot to show. One of: [density, histogram, boxplot, violin, densigram] 
+\item{type}{What type of marginal plot to show. One of: [density, histogram, boxplot, violin, densigram]
 (a "densigram" is when a density plot is overlaid on a histogram).}
 
 \item{margins}{Along which margins to show the plots. One of: [both, x, y].}
@@ -131,5 +141,5 @@ ggMarginal(p, groupColour = TRUE, groupFill = TRUE)
 
 }
 \seealso{
-\href{http://daattali.com/shiny/ggExtra-ggMarginal-demo/}{Demo Shiny app}
+\href{https://daattali.com/shiny/ggExtra-ggMarginal-demo/}{Demo Shiny app}
 }

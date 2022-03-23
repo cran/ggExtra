@@ -37,7 +37,15 @@ otherParams <- list(
   "both hists red col" = function() ggMarg2("histogram", colour = "red"),
   "top hist red col and fill" = function() ggMarg2(
     "histogram", xparams = list(colour = "red", fill = "red")
-  )
+  ),
+  "center and boundary set" = function() ggMarginal(
+      ggplot2::ggplot(mtcars, ggplot2::aes(x = cyl, y = carb)) +
+        ggplot2::geom_point() +
+        ggplot2::xlim(0, 10),
+      type = "histogram", 
+      xparams = list(center = 0, binwidth = 0.5),
+      yparams = list(boundary = 0, binwidth = 1),
+    )
 )
 miscIssues <- list(
   "theme bw" = function() ggMarginal(
@@ -80,6 +88,13 @@ groupingFeature <- list(
   "colour & fill mapped and both params provided" = function() ggMarginal(
     margMapP(), groupColour = TRUE, groupFill = TRUE, 
     colour = "red", fill = "blue"
+  ),
+  "groupFill doesn't impact hist heights - no fill" = function() ggMarginal(
+    margMapP(), type = "histogram", xparams = list(binwidth = .3)
+  ),
+  "groupFill doesn't impact hist heights - with fill" = function() ggMarginal(
+    margMapP(), type = "histogram", xparams = list(binwidth = .3),
+    groupFill = TRUE
   )
 )
 transforms <- list(
@@ -148,10 +163,17 @@ installVersion2 <- function(package, version) {
   )
 
   if (package == "ggplot2" && version == "latest") {
-    devtools::install_github("tidyverse/ggplot2", force = TRUE)
+    cat("\nInstalling ggplot2 from Github\n")
+    devtools::install_github(
+      "tidyverse/ggplot2", force = TRUE, quiet = TRUE, upgrade = FALSE,
+      ref = "main"
+    )
   } else if (currentVersion != version) {
     repos <- getSnapShotRepo(package, version)
-    devtools::install_version(package, version, repos = repos)
+    cat("\nInstalling", package, version, "using repo", repos, "\n")
+    devtools::install_version(
+      package, version, repos = repos, quiet = TRUE, upgrade = FALSE
+    )
   } else {
     return()
   }

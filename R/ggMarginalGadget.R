@@ -68,7 +68,7 @@ ggMarginalGadgetHelper <- function(origPlot, addin) {
     }
 
     tryCatch(
-      assign(plotname, eval(parse(text = origPlot))),
+      assign(plotname, eval(parse(text = origPlot)), envir = .GlobalEnv),
       error = function(err) {
         stop("You did not provide a valid ggplot2 plot.", call. = FALSE)
       }
@@ -76,8 +76,7 @@ ggMarginalGadgetHelper <- function(origPlot, addin) {
     baseCode <- paste0(plotname, " <- ", origPlot, "\n\n")
   }
 
-  if (!ggplot2::is.ggplot(get(plotname)) &&
-    !ggplot2::is.ggplot(get(plotname, envir = .GlobalEnv))) {
+  if (!ggplot2::is.ggplot(get(plotname, envir = .GlobalEnv))) {
     stop("You did not provide a ggplot2 plot.", call. = FALSE)
   }
 
@@ -97,7 +96,7 @@ ggMarginalGadgetHelper <- function(origPlot, addin) {
         strong("Add marginal plots to ggplot2"),
         span(
           id = "author", "By",
-          a(href = "http://deanattali.com", "Dean Attali")
+          a(href = "https://deanattali.com", "Dean Attali")
         )
       )
     ),
@@ -127,7 +126,10 @@ ggMarginalGadgetHelper <- function(origPlot, addin) {
             flex = c(2, 3),
             fillCol(
               class = "left-panel-area",
-              selectInput("type", "Plot type", c("density", "histogram", "boxplot", "violin")),
+              selectInput(
+                "type", "Plot type",
+                c("density", "histogram", "boxplot", "violin", "densigram")
+              ),
               selectInput(
                 "margins", "Which margins?",
                 c("both", "x axis only" = "x", "y axis only" = "y")
@@ -288,7 +290,7 @@ ggMarginalGadgetHelper <- function(origPlot, addin) {
 
     observeEvent(marginCode(), {
       tryCatch({
-        values$plot <- eval(parse(text = marginCode()))
+        values$plot <- eval(parse(text = marginCode()), envir = .GlobalEnv)
         values$error <- NULL
       }, error = function(err) {
         values$error <- as.character(err$message)
@@ -300,7 +302,7 @@ ggMarginalGadgetHelper <- function(origPlot, addin) {
       values$plot
     }, height = function() {
       if (is.null(input$plotHeight)) {
-        0
+        1
       } else {
         input$plotHeight
       }
